@@ -85,7 +85,7 @@ int main() {
 	double theta = 0.;
 	double theta_min = -M_PI / 3.;
 	double theta_max = M_PI / 3.;
-	double center_z = 0.6;
+	double center_z = 0.5;
 	double move_step = 1.0 / 10000;
 	int direction = 1; // 1 is positive, -1 is negative
 
@@ -93,14 +93,14 @@ int main() {
 	Vector3d elbow_position = Vector3d(0.0, 0.0, 0.0);
 	Matrix3d rotation = Matrix3d::Zero();
 	Vector3d initial_position = Vector3d::Zero();
-	Vector3d desired_position = Vector3d(0.0, -0.3, center_z);
+	Vector3d desired_position = Vector3d(0.0, -0.5, center_z);
 	Vector3d desired_initial_position = Vector3d(desired_position);
 	double elbow_z_des = 0.3;
-	// Matrix3d desired_orientation = Matrix3d::Zero();
-	// desired_orientation << -1., 0., 0.,
-	// 						0., 1., 0.,
-	// 						0., 0., 1.;
-	Quaterniond desired_orientation_quat = Quaterniond(0., 1., 0., 0.);
+	Matrix3d desired_orientation = Matrix3d::Zero();
+	desired_orientation << 0., 1., 0.,
+							1., 0., 0.,
+							0., 0., -1.;
+	// Quaterniond desired_orientation_quat = Quaterniond(0., 1., 0., 0.);
 	Vector3d linear_velocity = Vector3d(0.0, 0.0, 0.0);
 	Vector3d elbow_linear_velocity = Vector3d(0.0, 0.0, 0.0);
 	Vector3d angular_velocity = Vector3d(0.0, 0.0, 0.0);
@@ -235,7 +235,7 @@ int main() {
 		force_1 = lambda_1 * (-kp * position_error - kv * linear_velocity);
 		
 		// rotation control
-		Sai2Model::orientationError(rotation_error, desired_orientation_quat, Quaterniond(rotation));
+		Sai2Model::orientationError(rotation_error, desired_orientation, rotation);
 		// angular_velocity = Jac_2 * dq;
 		force_2 = lambda_2 * (-kp * rotation_error - kv * angular_velocity);
 		
