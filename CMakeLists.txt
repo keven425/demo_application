@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8.12)
 project (demo_application)
-SET(CMAKE_CXX_FLAGS "-std=c++11")
+SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/local/include -I/usr/include")
 
 # - eigen3
 set(EIGEN3_INCLUDE_DIR $ENV{EIGEN3_INCLUDE_DIR})

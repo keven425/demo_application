@@ -9,6 +9,8 @@
 #include <tinyxml2.h>
 
 #include <signal.h>
+#include <math.h>
+
 bool runloop = true;
 void sighandler(int sig)
 { runloop = false; }
@@ -77,13 +79,18 @@ int main() {
 	int dof = robot->dof();
 	VectorXd command_torques = VectorXd::Zero(dof);
 
-	double kp = 25.0;
-	double kv = 5.0;
+	double kp = 100.0;
+	double kv = 20.0;
 
 	VectorXd coriolis = VectorXd::Zero(dof);
 
 	VectorXd initial_position = robot->_q;
-	VectorXd desired_position = initial_position;
+	VectorXd desired_position(7);
+	desired_position << 0, 0, 0, 0, 0, 0, 0;
+	double max_angle = M_PI / 2.;
+	double min_angle = -M_PI / 2.;
+	double move_step = M_PI * 2 / 4000;
+	int direction = 1; // 1 is positive, -1 is negative
 
 	// create a loop timer
 	double control_freq = 1000;
@@ -95,7 +102,14 @@ int main() {
 
 	// while window is open:
 	while (runloop) {
-
+		if (desired_position[1] >= max_angle) {
+			direction = -1;
+		} else if (desired_position[1] <= min_angle) {
+			direction = 1;
+		}
+		desired_position[1] += direction * move_step; 
+		desired_position[2] += direction * move_step; 
+		desired_position[3] += direction * move_step; 
 		// wait for next scheduled loop
 		timer.waitForNextLoop();
 
@@ -111,13 +125,11 @@ int main() {
 			robot->coriolisForce(coriolis);
 		}
 
-		////////////////////////////// Compute joint torques
+		// Compute joint torques
 		double time = controller_counter/control_freq;
 
 		command_torques = -kp * (robot->_q - desired_position) - kv * robot->_dq;
-
-		//------ Final torques
-		// command_torques.setZero();
+		
 		redis_client.setEigenMatrixDerived(JOINT_TORQUES_COMMANDED_KEY, command_torques);
 
 		controller_counter++;
