@@ -78,14 +78,14 @@ int main() {
 
 	int dof = robot->dof();
 	int elbow_dof = 4;
-	
+
 	// trajectory
 	double max_x = 0.4;
 	double min_x = -0.4;
 	double theta = 0.;
 	double theta_min = -M_PI / 3.;
 	double theta_max = M_PI / 3.;
-	double center_y = 0.3;
+	double center_z = 0.6;
 	double move_step = 1.0 / 10000;
 	int direction = 1; // 1 is positive, -1 is negative
 
@@ -93,7 +93,7 @@ int main() {
 	Vector3d elbow_position = Vector3d(0.0, 0.0, 0.0);
 	Matrix3d rotation = Matrix3d::Zero();
 	Vector3d initial_position = Vector3d::Zero();
-	Vector3d desired_position = Vector3d(0.0, center_y, 0.2);
+	Vector3d desired_position = Vector3d(0.0, -0.3, center_z);
 	Vector3d desired_initial_position = Vector3d(desired_position);
 	double elbow_z_des = 0.3;
 	// Matrix3d desired_orientation = Matrix3d::Zero();
@@ -185,7 +185,7 @@ int main() {
 			}
 			desired_position[0] += direction * move_step;
 			x = desired_position[0];
-			desired_position[2] = center_y + 0.2 * sin(x * 20.);
+			desired_position[2] = center_z + 0.1 * sin(x * 20.);
 		}
 
 		// update the model 20 times slower (hacky, should use a separate thread)
